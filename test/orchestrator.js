@@ -23,7 +23,9 @@ async function dropTables() {
   await database.query("drop schema public cascade; create schema public;");
 }
 
-export default {
+const orchestrator = {
   waitAllServices,
   dropTables,
 };
+
+export default orchestrator;
