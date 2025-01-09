@@ -2,7 +2,7 @@ const { exec } = require("node:child_process");
 const loader = require("./loader.js");
 
 function checkPostgres() {
-  function handleReturn(error, stdout, stderr) {
+  function handleReturn(error, stdout) {
     if (stdout.search("accepting connections") === -1) {
       return checkPostgres();
     }
