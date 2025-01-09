@@ -7,7 +7,7 @@ function checkPostgres() {
       return checkPostgres();
     }
     loader.stopLoader();
-    console.log("🟢 Postgres esta aceitando conexões.");
+    console.log("🟢 Postgres esta aceitando conexões.\n");
   }
 
   exec("docker exec postgres-dev pg_isready --host localhost", handleReturn);
