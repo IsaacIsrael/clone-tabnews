@@ -2,7 +2,7 @@ import orchestrator from "test/orchestrator";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
-  await orchestrator.dropTables();
+  await orchestrator.clearDatabase();
 });
 
 describe("GET /api/v1/migrations", () => {
