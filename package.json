@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "prestart": "npm run services:up && npm run services:wait:database && npm run migrations:up ",
-    "start": "npm run dev",
+    "start": "trap 'exit 0' INT; npm run dev ",
+    "poststart": "npm run services:stop",
     "dev": "next dev",
     "pretest": "npm run services:up",
     "test": "concurrently -n next,jest --hide next -k -s command-jest \"npm run dev\" \"npm run jest\"",
+    "posttest": "npm run services:stop",
     "test:watch": "npm run jest -- --watchAll",
     "jest": "jest --runInBand",
     "services:up": "docker compose -f infra/compose.yaml up -d",
