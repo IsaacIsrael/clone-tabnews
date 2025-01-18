@@ -11,10 +11,10 @@ describe("GET /api/v1/status", () => {
       expect(response.status).toBe(200);
 
       const responseBody = await response.json();
-      expect(responseBody.update_at).toBeDefined();
+      expect(responseBody.updated_at).toBeDefined();
 
-      const parseUpdateAt = new Date(responseBody.update_at).toISOString();
-      expect(responseBody.update_at).toBe(parseUpdateAt);
+      const parseUpdateAt = new Date(responseBody.updated_at).toISOString();
+      expect(responseBody.updated_at).toBe(parseUpdateAt);
 
       expect(responseBody.dependencies).toBeDefined();
       expect(responseBody.dependencies.database).toBeDefined();
@@ -23,9 +23,9 @@ describe("GET /api/v1/status", () => {
       expect(responseBody.dependencies.database.max_connections).toBeDefined();
       expect(responseBody.dependencies.database.max_connections).toBe(100);
       expect(
-        responseBody.dependencies.database.active_connections,
+        responseBody.dependencies.database.opened_connections,
       ).toBeDefined();
-      expect(responseBody.dependencies.database.active_connections).toBe(1);
+      expect(responseBody.dependencies.database.opened_connections).toBe(1);
     });
   });
 });
