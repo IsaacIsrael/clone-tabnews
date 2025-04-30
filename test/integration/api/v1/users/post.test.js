@@ -1,5 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import orchestrator from "test/orchestrator";
+import user from "models/user";
+import password from "models/password";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
@@ -29,13 +31,26 @@ describe("POST /api/v1/users", () => {
         id: responseBody.id,
         username: "isaacisrael",
         email: "isaac@test.com",
-        password: "senha123",
+        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      const userInDatBase = await user.findOneByUsername(responseBody.username);
+      const correctPasswordMatch = await password.compare(
+        "senha123",
+        userInDatBase.password,
+      );
+      expect(correctPasswordMatch).toBe(true);
+
+      const incorrectPasswordMatch = await password.compare(
+        "incorrectPassword",
+        userInDatBase.password,
+      );
+      expect(incorrectPasswordMatch).toBe(false);
     });
     test("With duplicated 'email'", async () => {
       const response1 = await fetch("http://localhost:3000/api/v1/users", {
@@ -70,7 +85,7 @@ describe("POST /api/v1/users", () => {
       expect(response2Body).toEqual({
         name: "ValidationError",
         message: "This email is not avalible",
-        action: "Use another email for the user and submit again.",
+        action: "Use another email to perform this operation.",
         status_code: 400,
       });
     });
@@ -107,7 +122,7 @@ describe("POST /api/v1/users", () => {
       expect(response2Body).toEqual({
         name: "ValidationError",
         message: "This username is not avalible",
-        action: "Use another username for the user and submit again.",
+        action: "Use another username to perform this operation",
         status_code: 400,
       });
     });
