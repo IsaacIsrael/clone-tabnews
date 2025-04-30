@@ -85,7 +85,7 @@ describe("POST /api/v1/users", () => {
       expect(response2Body).toEqual({
         name: "ValidationError",
         message: "This email is not avalible",
-        action: "Use another email for the user and submit again.",
+        action: "Use another email to perform this operation.",
         status_code: 400,
       });
     });
@@ -122,7 +122,7 @@ describe("POST /api/v1/users", () => {
       expect(response2Body).toEqual({
         name: "ValidationError",
         message: "This username is not avalible",
-        action: "Use another username for the user and submit again.",
+        action: "Use another username to perform this operation",
         status_code: 400,
       });
     });
