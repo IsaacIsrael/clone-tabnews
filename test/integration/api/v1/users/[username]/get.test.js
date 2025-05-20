@@ -10,7 +10,7 @@ beforeAll(async () => {
 describe("GET /api/v1/users/[username]", () => {
   describe("Anonymos user", () => {
     test("With exact case match", async () => {
-      const createdUser = await orchestrator.createuser({
+      const createdUser = await orchestrator.createUser({
         username: "MesmoCase",
       });
 
@@ -35,7 +35,7 @@ describe("GET /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch", async () => {
-      const createdUser = await orchestrator.createuser({
+      const createdUser = await orchestrator.createUser({
         username: "CaseDiferente",
       });
 

@@ -30,7 +30,7 @@ async function runPendingMigrations() {
   await migrator.runPendingMigrations();
 }
 
-async function createuser(userObject) {
+async function createUser(userObject) {
   return user.create({
     username:
       userObject?.username || faker.internet.username().replace(/[_.-]/g, ""),
@@ -43,7 +43,7 @@ const orchestrator = {
   waitAllServices,
   clearDatabase,
   runPendingMigrations,
-  createuser,
+  createUser,
 };
 
 export default orchestrator;
