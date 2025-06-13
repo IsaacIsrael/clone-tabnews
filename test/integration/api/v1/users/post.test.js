@@ -54,7 +54,7 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated 'email'", async () => {
-      await orchestrator.createuser({
+      await orchestrator.createUser({
         email: "duplicatedEmail@test.com",
       });
 
@@ -82,7 +82,7 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated 'username'", async () => {
-      await orchestrator.createuser({
+      await orchestrator.createUser({
         username: "duplicatedUsername",
       });
 
