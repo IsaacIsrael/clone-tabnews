@@ -11,11 +11,11 @@ async function findOneById(id) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         id = $1
-      LIMIT 
+      LIMIT
         1
     `,
       values: [id],
@@ -39,11 +39,11 @@ async function findOneByUsername(username) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         LOWER(username) = LOWER($1)
-      LIMIT 
+      LIMIT
         1
     `,
       values: [username],
@@ -67,11 +67,11 @@ async function findOneByEmail(email) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         LOWER(email) = LOWER($1)
-      LIMIT 
+      LIMIT
         1
     `,
       values: [email],
@@ -90,6 +90,7 @@ async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
   await hashPasswordInObject(userInputValues);
+  injectDefaultFeaturesInObject(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
@@ -97,10 +98,10 @@ async function create(userInputValues) {
   async function runInsertQuery(userInputValues) {
     const result = await database.query({
       text: `
-      INSERT INTO 
-        users (username, email, password) 
-      VALUES 
-        ($1, $2, $3)
+      INSERT INTO
+        users (username, email, password, features)
+      VALUES
+        ($1, $2, $3, $4)
       RETURNING
         *
     `,
@@ -108,9 +109,14 @@ async function create(userInputValues) {
         userInputValues.username,
         userInputValues.email,
         userInputValues.password,
+        userInputValues.features,
       ],
     });
     return result.rows[0];
+  }
+
+  function injectDefaultFeaturesInObject(userInputValues) {
+    userInputValues.features = ["read:activation_token"];
   }
 }
 
@@ -168,7 +174,7 @@ async function validateUniqueUsername(username) {
     text: `
     SELECT
       username
-    FROM 
+    FROM
       users
     WHERE
       LOWER(username) = LOWER($1)
@@ -188,7 +194,7 @@ async function validateUniqueEmail(email) {
     text: `
     SELECT
       email
-    FROM 
+    FROM
       users
     WHERE
       LOWER(email) = LOWER($1)
