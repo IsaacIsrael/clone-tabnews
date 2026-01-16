@@ -1,5 +1,5 @@
 import { version as uuidVersion } from "uuid";
-import orchestrator from "test/orchestrator";
+import orchestrator from "tests/orchestrator";
 import user from "models/user";
 import password from "models/password";
 
