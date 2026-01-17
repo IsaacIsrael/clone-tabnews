@@ -1,5 +1,6 @@
 import database from "infra/database";
 import email from "infra/email";
+import { NotFoundError } from "infra/errors";
 import webserver from "infra/webserver";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // 15 minutes
@@ -25,11 +26,11 @@ async function create(userId) {
   }
 }
 
-async function findOneByUserId(userID) {
-  const newToken = await runSelectQuery(userID);
+async function findOneValidById(id) {
+  const newToken = await runSelectQuery(id);
   return newToken;
 
-  async function runSelectQuery(userID) {
+  async function runSelectQuery(id) {
     const result = await database.query({
       text: `
       SELECT
@@ -37,12 +38,21 @@ async function findOneByUserId(userID) {
       FROM
         user_activation_tokens
       WHERE
-        user_id = $1
+        id = $1
+        AND expires_at > NOW()
+        AND used_at IS NULL
       LIMIT
         1
     `,
-      values: [userID],
+      values: [id],
     });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "Activation token not found or is no longer valid.",
+        action: "Try registering again.",
+      });
+    }
 
     return result.rows[0];
   }
@@ -56,7 +66,7 @@ async function sendEmailToUser(user, activationToken) {
     text: `${user.username} welcome!
 Please activate your account using the following link:
 
-${webserver.origin}/register/activate/${activationToken.id}
+${webserver.origin}/registration/activate/${activationToken.id}
 
 Best regards,
 The InSystem Team
@@ -65,7 +75,7 @@ The InSystem Team
 }
 
 const activation = {
-  findOneByUserId,
+  findOneValidById,
   create,
   sendEmailToUser,
 };

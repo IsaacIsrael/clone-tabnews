@@ -7,7 +7,7 @@ function getOrigin() {
   }
 
   if (process.env.CODESPACES === "true") {
-    const port = process.env.PORT;
+    const port = process.env.PORT ?? "3000";
     const codespaceName = process.env.CODESPACE_NAME;
     const forwardingDomain =
       process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN;
