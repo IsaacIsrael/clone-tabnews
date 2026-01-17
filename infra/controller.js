@@ -1,5 +1,6 @@
 import * as cookie from "cookie";
 import session from "models/session";
+import user from "models/user";
 
 import {
   InternalServerError,
@@ -7,6 +8,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
+  ForbiddenError,
 } from "infra/errors";
 
 function onNoMatchHandler(request, response) {
@@ -15,7 +17,11 @@ function onNoMatchHandler(request, response) {
 }
 
 function onErrorHandler(error, request, response) {
-  if (error instanceof ValidationError || error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof ForbiddenError
+  ) {
     return response.status(error.statusCode).json(error);
   }
 
@@ -51,6 +57,51 @@ async function clearSessionCookie(response) {
   response.setHeader("Set-Cookie", setCookie);
 }
 
+async function injectAnonymousOrUser(request, response, next) {
+  let userObject;
+  if (request?.cookies.session_id) {
+    const sessionToken = request.cookies.session_id;
+    userObject = await getAuthenticatedUser(sessionToken);
+  } else {
+    userObject = await getAnonymousUser();
+  }
+
+  request.context = {
+    ...request.context,
+    user: userObject,
+  };
+
+  return next();
+}
+
+async function getAuthenticatedUser(sessionToken) {
+  const sessionObject = await session.findOneValidByToken(sessionToken);
+  const userObject = await user.findOneById(sessionObject.userId);
+  return userObject;
+}
+
+async function getAnonymousUser() {
+  const anonymousUser = {
+    feature: ["read:activation_token", "create:session", "create:user"],
+  };
+  return anonymousUser;
+}
+
+function canRequest(feature) {
+  return async function canRequestMiddleware(request, response, next) {
+    const userTryingToRequest = request.context.user;
+
+    if (userTryingToRequest.feature.includes(feature)) {
+      return next();
+    }
+
+    throw new ForbiddenError({
+      message: "User do not have permission to perform this action.",
+      action: `Check user permissions has a feature ${feature}.`,
+    });
+  };
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchHandler,
@@ -58,6 +109,8 @@ const controller = {
   },
   setSessionCookie,
   clearSessionCookie,
+  injectAnonymousOrUser,
+  canRequest,
 };
 
 export default controller;
