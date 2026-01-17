@@ -35,7 +35,7 @@ describe("DELETE /api/v1/user", () => {
 
     test("With expired session", async () => {
       jest.useFakeTimers({
-        now: new Date(Date.now() - session.EXPIRATION_IN_MILISECONS),
+        now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
 
       const createdUser = await orchestrator.createUser({
@@ -74,10 +74,10 @@ describe("DELETE /api/v1/user", () => {
       });
 
       const responseBody = await response.json();
-      // const caheControl = response.headers.get("Cache-Control");
+      // const cacheControl = response.headers.get("Cache-Control");
 
       expect(response.status).toBe(200);
-      // expect(caheControl).toBe(
+      // expect(cacheControl).toBe(
       //   "no-store, no-cache, max-age=0, must-revalidate",
       // );
       expect(responseBody).toEqual({

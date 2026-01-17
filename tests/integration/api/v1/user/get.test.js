@@ -24,10 +24,10 @@ describe("GET /api/v1/user", () => {
       });
 
       const responseBody = await response.json();
-      const caheControl = response.headers.get("Cache-Control");
+      const cacheControl = response.headers.get("Cache-Control");
 
       expect(response.status).toBe(200);
-      expect(caheControl).toBe(
+      expect(cacheControl).toBe(
         "no-store, no-cache, max-age=0, must-revalidate",
       );
       expect(responseBody).toEqual({
@@ -59,7 +59,7 @@ describe("GET /api/v1/user", () => {
       const updatedAt = new Date(renewedSessionObject.updated_at);
       expiresAt.setMilliseconds(0);
       updatedAt.setMilliseconds(0);
-      expect(expiresAt - updatedAt).toEqual(session.EXPIRATION_IN_MILISECONS);
+      expect(expiresAt - updatedAt).toEqual(session.EXPIRATION_IN_MILLISECONDS);
 
       // Set-cookie header assertions
       const parsedCookie = setCookieParser(response, { map: true });
@@ -67,7 +67,7 @@ describe("GET /api/v1/user", () => {
         name: "session_id",
         httpOnly: true,
         path: "/",
-        maxAge: session.EXPIRATION_IN_MILISECONS / 1000,
+        maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: renewedSessionObject.token,
       });
     });
@@ -105,7 +105,7 @@ describe("GET /api/v1/user", () => {
 
     test("With expired session", async () => {
       jest.useFakeTimers({
-        now: new Date(Date.now() - session.EXPIRATION_IN_MILISECONS),
+        now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
 
       const createdUser = await orchestrator.createUser({
@@ -144,7 +144,7 @@ describe("GET /api/v1/user", () => {
 
     test("With valid session about to expire", async () => {
       jest.useFakeTimers({
-        now: new Date(Date.now() - session.EXPIRATION_IN_MILISECONS + 100),
+        now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS + 200),
       });
 
       const createdUser = await orchestrator.createUser({
@@ -192,7 +192,7 @@ describe("GET /api/v1/user", () => {
       const updatedAt = new Date(renewedSessionObject.updated_at);
       expiresAt.setMilliseconds(0);
       updatedAt.setMilliseconds(0);
-      expect(expiresAt - updatedAt).toEqual(session.EXPIRATION_IN_MILISECONS);
+      expect(expiresAt - updatedAt).toEqual(session.EXPIRATION_IN_MILLISECONDS);
 
       // Set-cookie header assertions
       const parsedCookie = setCookieParser(response, { map: true });
@@ -200,7 +200,7 @@ describe("GET /api/v1/user", () => {
         name: "session_id",
         httpOnly: true,
         path: "/",
-        maxAge: session.EXPIRATION_IN_MILISECONS / 1000,
+        maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: renewedSessionObject.token,
       });
     });

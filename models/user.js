@@ -91,10 +91,10 @@ async function create(userInputValues) {
   await validateUniqueUsername(userInputValues.username);
   await hashPasswordInObject(userInputValues);
 
-  const newUser = await runInsertQuerry(userInputValues);
+  const newUser = await runInsertQuery(userInputValues);
   return newUser;
 
-  async function runInsertQuerry(userInputValues) {
+  async function runInsertQuery(userInputValues) {
     const result = await database.query({
       text: `
       INSERT INTO 
@@ -134,10 +134,10 @@ async function update(username, userInputValues) {
     ...userInputValues,
   };
 
-  const updatedUser = await runUpdateQuerry(userWithNewValues);
+  const updatedUser = await runUpdateQuery(userWithNewValues);
   return updatedUser;
 
-  async function runUpdateQuerry(userInputValues) {
+  async function runUpdateQuery(userInputValues) {
     const result = await database.query({
       text: `
       UPDATE
@@ -177,7 +177,7 @@ async function validateUniqueUsername(username) {
   });
   if (result.rowCount > 0) {
     throw new ValidationError({
-      message: "This username is not avalible",
+      message: "This username is not available",
       action: "Use another username to perform this operation",
     });
   }
@@ -197,7 +197,7 @@ async function validateUniqueEmail(email) {
   });
   if (result.rowCount > 0) {
     throw new ValidationError({
-      message: "This email is not avalible",
+      message: "This email is not available",
       action: "Use another email to perform this operation.",
     });
   }

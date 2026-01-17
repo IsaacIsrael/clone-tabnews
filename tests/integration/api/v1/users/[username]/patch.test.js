@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 describe("PATCH /api/v1/users/[username]", () => {
-  describe("Anonymos user", () => {
+  describe("Anonymous user", () => {
     test("With case no match", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
@@ -57,7 +57,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This username is not avalible",
+        message: "This username is not available",
         action: "Use another username to perform this operation",
         status_code: 400,
       });
@@ -90,7 +90,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This email is not avalible",
+        message: "This email is not available",
         action: "Use another email to perform this operation.",
         status_code: 400,
       });

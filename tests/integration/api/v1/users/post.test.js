@@ -10,8 +10,8 @@ beforeAll(async () => {
 });
 
 describe("POST /api/v1/users", () => {
-  describe("Anonymos user", () => {
-    test("With unique and valide data", async () => {
+  describe("Anonymous user", () => {
+    test("With unique and valid data", async () => {
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -75,7 +75,7 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This email is not avalible",
+        message: "This email is not available",
         action: "Use another email to perform this operation.",
         status_code: 400,
       });
@@ -103,7 +103,7 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This username is not avalible",
+        message: "This username is not available",
         action: "Use another username to perform this operation",
         status_code: 400,
       });

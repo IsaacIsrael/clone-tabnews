@@ -8,14 +8,14 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/users/[username]", () => {
-  describe("Anonymos user", () => {
+  describe("Anonymous user", () => {
     test("With exact case match", async () => {
       const createdUser = await orchestrator.createUser({
-        username: "MesmoCase",
+        username: "SameCase",
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/MesmoCase`,
+        `http://localhost:3000/api/v1/users/SameCase`,
       );
 
       const responseBody = await response.json();
@@ -23,7 +23,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
         id: responseBody.id,
-        username: "MesmoCase",
+        username: "SameCase",
         email: createdUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
@@ -36,11 +36,11 @@ describe("GET /api/v1/users/[username]", () => {
 
     test("With case mismatch", async () => {
       const createdUser = await orchestrator.createUser({
-        username: "CaseDiferente",
+        username: "DifferentCase",
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/casediferente`,
+        `http://localhost:3000/api/v1/users/differentcase`,
       );
 
       const responseBody = await response.json();
@@ -48,7 +48,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
         id: responseBody.id,
-        username: "CaseDiferente",
+        username: "DifferentCase",
         email: createdUser.email,
         password: responseBody.password,
         created_at: responseBody.created_at,
@@ -59,7 +59,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With noexistent 'username'", async () => {
+    test("With no existent 'username'", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
       );

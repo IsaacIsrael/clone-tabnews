@@ -17,10 +17,10 @@ function getNumberOfRound() {
 
 function mixPepper(password) {
   const pepper = process.env.PEPPER;
-  const peperSize = Math.round(pepper.length / 2);
+  const pepperSize = Math.round(pepper.length / 2);
 
-  const frontPepper = pepper.slice(0, peperSize);
-  const backPepper = pepper.slice(peperSize, pepper.length);
+  const frontPepper = pepper.slice(0, pepperSize);
+  const backPepper = pepper.slice(pepperSize, pepper.length);
 
   return frontPepper + password + backPepper;
 }

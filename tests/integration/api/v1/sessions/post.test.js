@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 describe("POST /api/v1/sessions", () => {
-  describe("Anonymos user", () => {
+  describe("Anonymous user", () => {
     test("With incorrect `email` but correct `password`", async () => {
       await orchestrator.createUser({
         password: "correct-password",
@@ -128,14 +128,14 @@ describe("POST /api/v1/sessions", () => {
       expiresAt.setMilliseconds(0);
       createdAt.setMilliseconds(0);
 
-      expect(expiresAt - createdAt).toEqual(session.EXPIRATION_IN_MILISECONS);
+      expect(expiresAt - createdAt).toEqual(session.EXPIRATION_IN_MILLISECONDS);
 
       const parsedCookie = setCookieParser(response, { map: true });
       expect(parsedCookie.session_id).toEqual({
         name: "session_id",
         httpOnly: true,
         path: "/",
-        maxAge: session.EXPIRATION_IN_MILISECONS / 1000,
+        maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: responseBody.token,
       });
     });

@@ -6,8 +6,8 @@ beforeAll(async () => {
 });
 
 describe("POST /api/v1/migrations", () => {
-  describe("Anonymos user", () => {
-    describe("Running pedding migrations", () => {
+  describe("Anonymous user", () => {
+    describe("Running pending migrations", () => {
       test("Running for first time", async () => {
         const response1 = await fetch(
           "http://localhost:3000/api/v1/migrations",

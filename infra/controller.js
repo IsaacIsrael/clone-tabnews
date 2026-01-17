@@ -10,8 +10,8 @@ import {
 } from "infra/errors";
 
 function onNoMatchHandler(request, response) {
-  const puclicErrorObjcet = new MethodNotAllowedError();
-  response.status(puclicErrorObjcet.statusCode).json(puclicErrorObjcet);
+  const publicErrorObject = new MethodNotAllowedError();
+  response.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
 function onErrorHandler(error, request, response) {
@@ -24,17 +24,17 @@ function onErrorHandler(error, request, response) {
     return response.status(error.statusCode).json(error);
   }
 
-  const puclicErrorObjcet = new InternalServerError({
+  const publicErrorObject = new InternalServerError({
     cause: error,
   });
-  console.error(puclicErrorObjcet);
-  response.status(puclicErrorObjcet.statusCode).json(puclicErrorObjcet);
+  console.error(publicErrorObject);
+  response.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
 async function setSessionCookie(sessionToken, response) {
   const setCookie = cookie.serialize("session_id", sessionToken, {
     path: "/",
-    maxAge: session.EXPIRATION_IN_MILISECONS / 1000,
+    maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
   });
