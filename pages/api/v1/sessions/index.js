@@ -2,7 +2,10 @@ import { createRouter } from "next-connect";
 import controller from "infra/controller";
 
 import authentication from "models/authentication";
+import authorization from "models/authorization";
 import session from "models/session";
+
+import { ForbiddenError } from "infra/errors";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
@@ -13,10 +16,19 @@ export default router.handler(controller.errorHandlers);
 
 async function postHandler(request, response) {
   const userInputValues = request.body;
+
   const authenticatedUser = await authentication.getAuthenticatedUser(
     userInputValues.email,
     userInputValues.password,
   );
+
+  if (!authorization.can(authenticatedUser, "create:session")) {
+    throw new ForbiddenError({
+      message: "User do not have permission to login.",
+      action: "Contact support for assistance if you believe this is an error.",
+    });
+  }
+
   const newSession = await session.create(authenticatedUser.id);
 
   controller.setSessionCookie(newSession.token, response);

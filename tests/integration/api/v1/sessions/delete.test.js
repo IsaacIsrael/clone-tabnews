@@ -72,7 +72,6 @@ describe("DELETE /api/v1/user", () => {
           Cookie: `session_id=${sessionObject.token}`,
         },
       });
-
       const responseBody = await response.json();
       // const cacheControl = response.headers.get("Cache-Control");
 
