@@ -15,20 +15,18 @@ describe("GET /api/v1/users/[username]", () => {
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/SameCase`,
+        `http://localhost:3000/api/v1/users/${createdUser.username}`,
       );
 
       const responseBody = await response.json();
 
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
-        id: responseBody.id,
-        username: "SameCase",
-        email: createdUser.email,
-        features: ["read:activation_token"],
-        password: responseBody.password,
-        created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        id: createdUser.id,
+        username: createdUser.username,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
+        updated_at: createdUser.updated_at.toISOString(),
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
@@ -48,13 +46,11 @@ describe("GET /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
-        id: responseBody.id,
-        username: "DifferentCase",
-        email: createdUser.email,
-        features: ["read:activation_token"],
-        password: responseBody.password,
-        created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        id: createdUser.id,
+        username: createdUser.username,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
+        updated_at: createdUser.updated_at.toISOString(),
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();

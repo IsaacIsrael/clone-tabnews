@@ -185,12 +185,10 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const responseBody = await response.json();
       expect(responseBody).toEqual({
-        id: responseBody.id,
+        id: createdUser.id,
         username: "uniqueUser",
-        email: createdUser.email,
-        features: ["create:session", "read:session", "update:user"],
-        password: responseBody.password,
-        created_at: responseBody.created_at,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
         updated_at: responseBody.updated_at,
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -221,18 +219,21 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const responseBody = await response.json();
       expect(responseBody).toEqual({
-        id: responseBody.id,
+        id: createdUser.id,
         username: createdUser.username,
-        email: "uniqueEmail@test.com",
-        features: ["create:session", "read:session", "update:user"],
-        password: responseBody.password,
-        created_at: responseBody.created_at,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
         updated_at: responseBody.updated_at,
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
+
+      const userInDatabase = await user.findOneByUsername(
+        responseBody.username,
+      );
+      expect(userInDatabase.email).toBe("uniqueEmail@test.com");
     });
 
     test("With new 'password'", async () => {
@@ -259,12 +260,10 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       const responseBody = await response.json();
       expect(responseBody).toEqual({
-        id: responseBody.id,
+        id: createdUser.id,
         username: createdUser.username,
-        email: createdUser.email,
-        features: ["create:session", "read:session", "update:user"],
-        password: responseBody.password,
-        created_at: responseBody.created_at,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
         updated_at: responseBody.updated_at,
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -272,16 +271,18 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
 
-      const userInDatBase = await user.findOneByUsername(responseBody.username);
+      const userInDatabase = await user.findOneByUsername(
+        responseBody.username,
+      );
       const correctPasswordMatch = await password.compare(
         "newPassword",
-        userInDatBase.password,
+        userInDatabase.password,
       );
       expect(correctPasswordMatch).toBe(true);
 
       const incorrectPasswordMatch = await password.compare(
         "oldPassword",
-        userInDatBase.password,
+        userInDatabase.password,
       );
       expect(incorrectPasswordMatch).toBe(false);
     });
@@ -315,12 +316,11 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(response.status).toBe(200);
 
       const responseBody = await response.json();
+
       expect(responseBody).toEqual({
-        id: responseBody.id,
+        id: defaultUser.id,
         username: "user3",
-        email: defaultUser.email,
         features: defaultUser.features,
-        password: responseBody.password,
         created_at: defaultUser.created_at.toISOString(),
         updated_at: responseBody.updated_at,
       });
