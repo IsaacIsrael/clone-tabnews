@@ -1,4 +1,33 @@
+import { InternalServerError } from "infra/errors";
+
+const availableFeatures = [
+  // User features
+  "read:user",
+  "create:user",
+  "read:user:self",
+  "update:user",
+  "update:user:others",
+
+  // Session features
+  "read:session",
+  "create:session",
+
+  // Activation token features
+  "read:activation_token",
+
+  // Migration features
+  "read:migration",
+  "create:migration",
+
+  // Status features
+  "read:status",
+  "read:status:all",
+];
+
 function can(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+
   let authorized = false;
 
   if (user.features.includes(feature)) {
@@ -16,6 +45,10 @@ function can(user, feature, resource) {
 }
 
 function filterOutput(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+  validateResource(resource);
+
   if (feature === "read:user") {
     return {
       id: resource.id,
@@ -84,6 +117,30 @@ function filterOutput(user, feature, resource) {
     }
 
     return output;
+  }
+}
+
+function validateUser(user) {
+  if (!user || !user.features) {
+    throw new InternalServerError({
+      cause: "`user` is required to model `authorization.js`.",
+    });
+  }
+}
+
+function validateFeature(feature) {
+  if (!feature || !availableFeatures.includes(feature)) {
+    throw new InternalServerError({
+      cause: "known `feature` is required to model `authorization.js`.",
+    });
+  }
+}
+
+function validateResource(resource) {
+  if (!resource) {
+    throw new InternalServerError({
+      cause: "`resource` is required to model `authorization.js`.",
+    });
   }
 }
 
