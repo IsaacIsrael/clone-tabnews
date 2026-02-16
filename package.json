@@ -66,6 +66,9 @@
     "secretlint": "9.0.0",
     "set-cookie-parser": "2.7.1"
   },
+  "engines": {
+    "node": "24"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
