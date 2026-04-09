@@ -62,7 +62,7 @@ async function findOneValidById(id) {
 
 async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "InSystem <contato@insystem.com.br>",
+    from: "InSystem <contato@alerts.iisrael.com.br>",
     to: user.email,
     subject: "Activate you account at InSystem",
     text: `${user.username} welcome!
