@@ -1,7 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
-import orchestrator from "test/orchestrator";
+import orchestrator from "tests/orchestrator";
 import session from "models/session";
 
 beforeAll(async () => {
@@ -35,13 +35,13 @@ describe("DELETE /api/v1/user", () => {
 
     test("With expired session", async () => {
       jest.useFakeTimers({
-        now: new Date(Date.now() - session.EXPIRATION_IN_MILISECONS),
+        now: new Date(Date.now() - session.EXPIRATION_IN_MILLISECONDS),
       });
 
       const createdUser = await orchestrator.createUser({
         username: "UserWithExpiredSession",
       });
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
 
       jest.useRealTimers();
       const response = await fetch(`http://localhost:3000/api/v1/sessions`, {
@@ -65,19 +65,18 @@ describe("DELETE /api/v1/user", () => {
       const createdUser = await orchestrator.createUser({
         username: "UserWithValidSession",
       });
-      const sessionObject = await orchestrator.createSession(createdUser.id);
+      const sessionObject = await orchestrator.createSession(createdUser);
       const response = await fetch(`http://localhost:3000/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           Cookie: `session_id=${sessionObject.token}`,
         },
       });
-
       const responseBody = await response.json();
-      // const caheControl = response.headers.get("Cache-Control");
+      // const cacheControl = response.headers.get("Cache-Control");
 
       expect(response.status).toBe(200);
-      // expect(caheControl).toBe(
+      // expect(cacheControl).toBe(
       //   "no-store, no-cache, max-age=0, must-revalidate",
       // );
       expect(responseBody).toEqual({

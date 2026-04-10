@@ -1,5 +1,5 @@
 import { version as uuidVersion } from "uuid";
-import orchestrator from "test/orchestrator";
+import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
@@ -8,26 +8,25 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/users/[username]", () => {
-  describe("Anonymos user", () => {
+  describe("Anonymous user", () => {
     test("With exact case match", async () => {
       const createdUser = await orchestrator.createUser({
-        username: "MesmoCase",
+        username: "SameCase",
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/MesmoCase`,
+        `http://localhost:3000/api/v1/users/${createdUser.username}`,
       );
 
       const responseBody = await response.json();
 
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
-        id: responseBody.id,
-        username: "MesmoCase",
-        email: createdUser.email,
-        password: responseBody.password,
-        created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        id: createdUser.id,
+        username: createdUser.username,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
+        updated_at: createdUser.updated_at.toISOString(),
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
@@ -36,30 +35,29 @@ describe("GET /api/v1/users/[username]", () => {
 
     test("With case mismatch", async () => {
       const createdUser = await orchestrator.createUser({
-        username: "CaseDiferente",
+        username: "DifferentCase",
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/casediferente`,
+        `http://localhost:3000/api/v1/users/differentcase`,
       );
 
       const responseBody = await response.json();
 
       expect(response.status).toBe(200);
       expect(responseBody).toEqual({
-        id: responseBody.id,
-        username: "CaseDiferente",
-        email: createdUser.email,
-        password: responseBody.password,
-        created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
+        id: createdUser.id,
+        username: createdUser.username,
+        features: createdUser.features,
+        created_at: createdUser.created_at.toISOString(),
+        updated_at: createdUser.updated_at.toISOString(),
       });
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With noexistent 'username'", async () => {
+    test("With no existent 'username'", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
       );

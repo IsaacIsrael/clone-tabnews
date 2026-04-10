@@ -1,12 +1,12 @@
-import orchestrator from "test/orchestrator";
+import orchestrator from "tests/orchestrator";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
 });
 
 describe("DELETE /api/v1/status", () => {
-  describe("Anonymos user", () => {
-    test("Delete pedding migrations", async () => {
+  describe("Anonymous user", () => {
+    test("Delete pending migrations", async () => {
       const response = await fetch("http://localhost:3000/api/v1/migrations", {
         method: "DELETE",
       });

@@ -11,11 +11,11 @@ async function findOneById(id) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         id = $1
-      LIMIT 
+      LIMIT
         1
     `,
       values: [id],
@@ -39,11 +39,11 @@ async function findOneByUsername(username) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         LOWER(username) = LOWER($1)
-      LIMIT 
+      LIMIT
         1
     `,
       values: [username],
@@ -67,11 +67,11 @@ async function findOneByEmail(email) {
       text: `
       SELECT
         *
-      FROM 
+      FROM
         users
       WHERE
         LOWER(email) = LOWER($1)
-      LIMIT 
+      LIMIT
         1
     `,
       values: [email],
@@ -90,17 +90,18 @@ async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
   await hashPasswordInObject(userInputValues);
+  injectDefaultFeaturesInObject(userInputValues);
 
-  const newUser = await runInsertQuerry(userInputValues);
+  const newUser = await runInsertQuery(userInputValues);
   return newUser;
 
-  async function runInsertQuerry(userInputValues) {
+  async function runInsertQuery(userInputValues) {
     const result = await database.query({
       text: `
-      INSERT INTO 
-        users (username, email, password) 
-      VALUES 
-        ($1, $2, $3)
+      INSERT INTO
+        users (username, email, password, features)
+      VALUES
+        ($1, $2, $3, $4)
       RETURNING
         *
     `,
@@ -108,9 +109,14 @@ async function create(userInputValues) {
         userInputValues.username,
         userInputValues.email,
         userInputValues.password,
+        userInputValues.features,
       ],
     });
     return result.rows[0];
+  }
+
+  function injectDefaultFeaturesInObject(userInputValues) {
+    userInputValues.features = ["read:activation_token"];
   }
 }
 
@@ -134,10 +140,10 @@ async function update(username, userInputValues) {
     ...userInputValues,
   };
 
-  const updatedUser = await runUpdateQuerry(userWithNewValues);
+  const updatedUser = await runUpdateQuery(userWithNewValues);
   return updatedUser;
 
-  async function runUpdateQuerry(userInputValues) {
+  async function runUpdateQuery(userInputValues) {
     const result = await database.query({
       text: `
       UPDATE
@@ -168,7 +174,7 @@ async function validateUniqueUsername(username) {
     text: `
     SELECT
       username
-    FROM 
+    FROM
       users
     WHERE
       LOWER(username) = LOWER($1)
@@ -177,7 +183,7 @@ async function validateUniqueUsername(username) {
   });
   if (result.rowCount > 0) {
     throw new ValidationError({
-      message: "This username is not avalible",
+      message: "This username is not available",
       action: "Use another username to perform this operation",
     });
   }
@@ -188,7 +194,7 @@ async function validateUniqueEmail(email) {
     text: `
     SELECT
       email
-    FROM 
+    FROM
       users
     WHERE
       LOWER(email) = LOWER($1)
@@ -197,7 +203,7 @@ async function validateUniqueEmail(email) {
   });
   if (result.rowCount > 0) {
     throw new ValidationError({
-      message: "This email is not avalible",
+      message: "This email is not available",
       action: "Use another email to perform this operation.",
     });
   }
@@ -208,12 +214,60 @@ async function hashPasswordInObject(userInputValues) {
   userInputValues.password = hashPassword;
 }
 
+async function setFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const result = await database.query({
+      text: `
+      UPDATE
+        users
+      SET
+        features = $2,
+        updated_at = timezone('utc', now())
+      WHERE
+        id = $1
+      RETURNING
+        *
+    `,
+      values: [userId, features],
+    });
+    return result.rows[0];
+  }
+}
+
+async function addFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const result = await database.query({
+      text: `
+      UPDATE
+        users
+      SET
+        features = array_cat(features, $2),
+        updated_at = timezone('utc', now())
+      WHERE
+        id = $1
+      RETURNING
+        *
+    `,
+      values: [userId, features],
+    });
+    return result.rows[0];
+  }
+}
+
 const user = {
   create,
   findOneById,
   findOneByUsername,
   findOneByEmail,
   update,
+  setFeatures,
+  addFeatures,
 };
 
 export default user;

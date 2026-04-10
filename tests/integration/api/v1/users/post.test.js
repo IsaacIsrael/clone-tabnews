@@ -1,5 +1,5 @@
 import { version as uuidVersion } from "uuid";
-import orchestrator from "test/orchestrator";
+import orchestrator from "tests/orchestrator";
 import user from "models/user";
 import password from "models/password";
 
@@ -10,8 +10,8 @@ beforeAll(async () => {
 });
 
 describe("POST /api/v1/users", () => {
-  describe("Anonymos user", () => {
-    test("With unique and valide data", async () => {
+  describe("Anonymous user", () => {
+    test("With unique and valid data", async () => {
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -30,8 +30,7 @@ describe("POST /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "isaacisrael",
-        email: "isaac@test.com",
-        password: responseBody.password,
+        features: ["read:activation_token"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -75,7 +74,7 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This email is not avalible",
+        message: "This email is not available",
         action: "Use another email to perform this operation.",
         status_code: 400,
       });
@@ -103,9 +102,39 @@ describe("POST /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "This username is not avalible",
+        message: "This username is not available",
         action: "Use another username to perform this operation",
         status_code: 400,
+      });
+    });
+  });
+
+  describe("Default user", () => {
+    test("With unique and valid data", async () => {
+      const user1 = await orchestrator.createActivatedUser();
+      const user1SessionObject = await orchestrator.createSession(user1);
+
+      const user2response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `session_id=${user1SessionObject.token}`,
+        },
+        body: JSON.stringify({
+          username: "isaacisrael",
+          email: "isaac@test.com",
+          password: "senha123",
+        }),
+      });
+
+      expect(user2response.status).toBe(403);
+
+      const responseBody = await user2response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        action: "Check user permissions has a feature create:user.",
+        message: "User do not have permission to perform this action.",
+        status_code: 403,
       });
     });
   });

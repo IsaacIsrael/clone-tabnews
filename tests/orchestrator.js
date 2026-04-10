@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker/.";
 import retry from "async-retry";
 import database from "infra/database";
+import activation from "models/activation";
 import migrator from "models/migrator";
 import session from "models/session";
 import user from "models/user";
@@ -57,8 +58,22 @@ async function createUser(userObject) {
   });
 }
 
-async function createSession(userId) {
-  return session.create(userId);
+async function activateUser(inactiveUser) {
+  return await activation.activateUserByUserId(inactiveUser.id);
+}
+
+async function createActivatedUser(userObject) {
+  const inactiveUser = await createUser(userObject);
+  return await activateUser(inactiveUser);
+}
+
+async function createSession(userObject) {
+  return session.create(userObject.id);
+}
+
+async function addFeaturesToUser(userObject, features) {
+  const updatedUser = await user.addFeatures(userObject.id, features);
+  return updatedUser;
 }
 
 async function deleteAllEmails() {
@@ -70,6 +85,10 @@ async function getLastEmail() {
   const emailListResponseBody = await emailListResponse.json();
   const lastEmailItem = emailListResponseBody.pop();
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const emailTextResponse = await fetch(
     `${emailHttpUrl}/messages/${lastEmailItem.id}.plain`,
   );
@@ -77,6 +96,13 @@ async function getLastEmail() {
 
   lastEmailItem.text = emailTextBody;
   return lastEmailItem;
+}
+
+function extractUUID(text) {
+  const match = text.match(
+    /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,
+  );
+  return match ? match[0] : null;
 }
 
 const orchestrator = {
@@ -87,6 +113,10 @@ const orchestrator = {
   createSession,
   deleteAllEmails,
   getLastEmail,
+  extractUUID,
+  activateUser,
+  createActivatedUser,
+  addFeaturesToUser,
 };
 
 export default orchestrator;
