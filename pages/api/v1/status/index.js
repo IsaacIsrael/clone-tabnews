@@ -47,5 +47,5 @@ async function getHandler(request, response) {
     statusObject,
   ); // No sensitive data to filter here
 
-  response.status(200).json(secureOutputValues);
+  return response.status(200).json(secureOutputValues);
 }
