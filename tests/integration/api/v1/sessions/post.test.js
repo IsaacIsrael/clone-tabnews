@@ -135,6 +135,7 @@ describe("POST /api/v1/sessions", () => {
       expect(parsedCookie.session_id).toEqual({
         name: "session_id",
         httpOnly: true,
+        sameSite: "Lax",
         path: "/",
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: responseBody.token,

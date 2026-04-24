@@ -83,6 +83,7 @@ describe("GET /api/v1/user", () => {
       expect(parsedCookie.session_id).toEqual({
         name: "session_id",
         httpOnly: true,
+        sameSite: "Lax",
         path: "/",
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: renewedSessionObject.token,
@@ -221,6 +222,7 @@ describe("GET /api/v1/user", () => {
       expect(parsedCookie.session_id).toEqual({
         name: "session_id",
         httpOnly: true,
+        sameSite: "Lax",
         path: "/",
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         value: renewedSessionObject.token,
