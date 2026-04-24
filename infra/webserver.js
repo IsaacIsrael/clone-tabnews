@@ -1,8 +1,5 @@
 function getOrigin() {
-  if (
-    ["development", "test"].includes(process.env.NODE_ENV) &&
-    !process.env.CODESPACES
-  ) {
+  if (["development", "test"].includes(process.env.NODE_ENV)) {
     return "http://localhost:3000";
   }
 
