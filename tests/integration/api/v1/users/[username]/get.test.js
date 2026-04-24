@@ -57,7 +57,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With no existent 'username'", async () => {
+    test("With no existent `username`", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
       );
