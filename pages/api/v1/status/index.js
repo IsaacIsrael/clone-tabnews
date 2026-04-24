@@ -3,9 +3,9 @@ import database from "infra/database.js";
 import controller from "infra/controller";
 import authorization from "models/authorization";
 
-const router = createRouter();
-router.use(controller.injectAnonymousOrUser);
-router.get(getHandler);
+const router = createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(getHandler);
 
 export default router.handler(controller.errorHandlers);
 
