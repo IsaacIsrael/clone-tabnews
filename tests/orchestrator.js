@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker/.";
+import { faker } from "@faker-js/faker";
 import retry from "async-retry";
 import database from "infra/database";
 import webserver from "infra/webserver";
@@ -14,10 +14,7 @@ async function waitAllServices() {
   await waitForEmailServices();
 
   async function waitForWebServices() {
-    return retry(fetchStatusPage, {
-      retries: 100,
-      maxTimeout: 1000,
-    });
+    return retry(fetchStatusPage, { retries: 100, maxTimeout: 1000 });
 
     async function fetchStatusPage() {
       const response = await fetch(`${webserver.origin}/api/v1/status`);
@@ -28,10 +25,7 @@ async function waitAllServices() {
   }
 
   async function waitForEmailServices() {
-    return retry(fetchEmailPage, {
-      retries: 100,
-      maxTimeout: 1000,
-    });
+    return retry(fetchEmailPage, { retries: 100, maxTimeout: 1000 });
 
     async function fetchEmailPage() {
       const response = await fetch(emailHttpUrl);
