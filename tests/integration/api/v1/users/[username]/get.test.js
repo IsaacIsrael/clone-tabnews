@@ -1,5 +1,6 @@
 import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
@@ -15,7 +16,7 @@ describe("GET /api/v1/users/[username]", () => {
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
       );
 
       const responseBody = await response.json();
@@ -39,7 +40,7 @@ describe("GET /api/v1/users/[username]", () => {
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/differentcase`,
+        `${webserver.origin}/api/v1/users/differentcase`,
       );
 
       const responseBody = await response.json();
@@ -57,9 +58,9 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With no existent 'username'", async () => {
+    test("With no existent `username`", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
+        `${webserver.origin}/api/v1/users/UsuarioQueNaoExiste`,
       );
 
       const responseBody = await response.json();

@@ -4,10 +4,9 @@ import user from "models/user";
 import session from "models/session";
 import authorization from "models/authorization";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:session"), getHandler);
+const router = createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest("read:session"), getHandler);
 
 export default router.handler(controller.errorHandlers);
 

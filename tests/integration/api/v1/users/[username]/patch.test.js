@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator";
 import user from "models/user";
 import password from "models/password";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitAllServices();
@@ -11,11 +12,11 @@ beforeAll(async () => {
 
 describe("PATCH /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
-    test("With unique 'username'", async () => {
+    test("With unique `username`", async () => {
       const createdUser = await orchestrator.createUser();
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -45,7 +46,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/UsuarioQueNaoExiste",
+        `${webserver.origin}/api/v1/users/UsuarioQueNaoExiste`,
         {
           method: "PATCH",
           headers: {
@@ -65,7 +66,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With duplicated 'username'", async () => {
+    test("With duplicated `username`", async () => {
       await orchestrator.createUser({
         username: "user1",
       });
@@ -74,7 +75,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject2 = await orchestrator.createSession(createdUser2);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser2.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -104,7 +105,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject2 = await orchestrator.createSession(createdUser2);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createsUser1.username}`,
+        `${webserver.origin}/api/v1/users/${createsUser1.username}`,
         {
           method: "PATCH",
           headers: {
@@ -128,7 +129,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With duplicated 'email'", async () => {
+    test("With duplicated `email`", async () => {
       await orchestrator.createUser({
         email: "email1@test.com",
       });
@@ -139,7 +140,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const sessionObject2 = await orchestrator.createSession(createdUser2);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser2.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -163,12 +164,12 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
-    test("With unique 'username'", async () => {
+    test("With unique `username`", async () => {
       const createdUser = await orchestrator.createActivatedUser();
       const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -197,12 +198,12 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
-    test("With new 'email'", async () => {
+    test("With new `email`", async () => {
       const createdUser = await orchestrator.createActivatedUser();
       const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -236,14 +237,14 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(userInDatabase.email).toBe("uniqueEmail@test.com");
     });
 
-    test("With new 'password'", async () => {
+    test("With new `password`", async () => {
       const createdUser = await orchestrator.createActivatedUser({
         password: "oldPassword",
       });
       const sessionObject = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -300,7 +301,7 @@ describe("PATCH /api/v1/users/[username]", () => {
         await orchestrator.createSession(privilegedUser);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        `${webserver.origin}/api/v1/users/${defaultUser.username}`,
         {
           method: "PATCH",
           headers: {
